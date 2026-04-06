@@ -36,4 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Amplify build via Webhook
-        run: curl -X POST -d {} "${{ secrets.AMPLIFY_WEBHOOK_URL }}"
+        env:
+          WEBHOOK_URL: ${{ secrets.AMPLIFY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::warning::AMPLIFY_WEBHOOK_URL secret is not set. Skipping Amplify trigger."
+            exit 0
+          fi
+          curl -X POST -d {} "$WEBHOOK_URL"
